@@ -196,7 +196,7 @@ short-URL + lighter guard  -> 56.350
 - replay 成功率。
 
 该短 URL 结论属于特定旧模板和特定运行的历史证据，不应被提升为普遍规律。当前仓库的更短
-`.co` domain 方案已经取得 `61.555`，说明 URL 效果必须与整个 framing 和 runtime policy 一起
+`.co` domain 方案已经取得 `64.095`，说明 URL 效果必须与整个 framing 和 runtime policy 一起
 A/B 测试。
 
 ## 9. 其他看似合理但未兑现的方向

@@ -43,20 +43,23 @@ FALLBACK_N = 300
 
 Latest public leaderboard result:
 
-- Previous current version: `60.340`
-- Promoted live validation-fill version: `61.555`
-- Public rank at that submission: `106 / 1688`
+- Previous promoted version: `61.555` (rank `106 / 1688`)
+- Current promoted version: `64.095` (template-rate selection + tail4)
 - Public top score observed by user: `100.6`
 
-The promoted version starts the fill deadline after the warm-up interaction, with
-`MARGIN_S = 45.0` and `FILL_BUDGET_FRAC = 0.95`. Keep that behavior as the active
+The current promoted version is byte-identical (SHA256 match) to
+`submission/current/submit.py`. It keeps the fill deadline after the warm-up
+interaction, with `MARGIN_S = 45.0` and `FILL_BUDGET_FRAC = 0.97`, adds a
+5-template rate-based selection pass (`PROBES_PER_TEMPLATE = 3`), and appends a
+small `TAIL_N = 4` after live validation-fill. Keep that behavior as the active
 baseline unless a later submission shows timeout regression.
 
-The `61.555` version is not a different attack primitive from the `60.340`
+The `64.095` version is not a different attack primitive from the `61.555`
 version. Both use single-step `http.post` exfiltration with `SECRET_MARKER`,
 unique domains, and live validation-fill. The score delta is mostly throughput
-and budget-boundary behavior: `61.555 - 60.340 = 1.215`, which is roughly
-`13-14` additional successful unique cells at `0.09` points each.
+and budget-boundary behavior: `64.095 - 61.555 = 2.54`, which is roughly
+`28` additional successful unique cells at `0.09` points each, attributable to
+template-rate selection, the higher budget fraction, and the small tail.
 
 Long scoring time is expected for this strategy: generation probes candidates
 live, and Kaggle then replays the returned candidates for scoring. The method
@@ -187,8 +190,8 @@ Reference points:
 These are theoretical if every candidate fires and replay completes. The real bottleneck is wall-clock budget, especially for `gpt_oss`.
 
 To match a `100.6` public score with the current single-post primitive would
-need about `1118` successful unique cells. From the `61.555` baseline, that is
-roughly `434` more successful cells, so the main path is increasing successful
+need about `1118` successful unique cells. From the `64.095` baseline, that is
+roughly `406` more successful cells, so the main path is increasing successful
 cells per wall-clock second or adding another reliable scored predicate without
 hurting throughput.
 
