@@ -11,7 +11,8 @@ when a submission teaches us something useful.
 | 2.970 | unknown | `lb_2_97_single_template/` | Static/small single-template validation | 33 successful unique cells | Verified scoring math: `33 * 0.09 = 2.97`. Existing archived code in this directory may not exactly match the original static submission; treat this result as a historical score note unless reconstructed. |
 | 60.340 | unknown | `lb_60_340_live_fill/` | ShadowCat-style live validation-fill | `MARGIN_S = 47.0`, `FILL_BUDGET_FRAC = 0.965`, deadline starts before warm-up | Same primitive as 61.555. Good public baseline, but slightly fewer effective cells. |
 | 61.555 | 106 / 1688 | `lb_61_555_live_fill/` | ShadowCat-style live validation-fill | `MARGIN_S = 45.0`, `FILL_BUDGET_FRAC = 0.95`, deadline starts after warm-up | Previous promoted baseline. Scoring took a long time, which is expected because generation probes live and Kaggle replays returned candidates. |
-| 64.095 | unknown | `lb_64_095_template_rate_tail4/` | ShadowCat-style live validation-fill + template-rate selection | `MARGIN_S = 45.0`, `FILL_BUDGET_FRAC = 0.97`, 5-template probe with rate-based selection, `PROBES_PER_TEMPLATE = 3`, `TAIL_N = 4`, stricter `_fired` (`ok is not True`), stderr telemetry | Current promoted baseline. Code is byte-identical (SHA256 match) to `submission/current/submit.py`. Gain over 61.555 is `2.54` points ~= 28 more successful unique cells. |
+| 64.095 | unknown | `lb_64_095_template_rate_tail4/` | ShadowCat-style live validation-fill + template-rate selection | `MARGIN_S = 45.0`, `FILL_BUDGET_FRAC = 0.97`, 5-template probe with rate-based selection, `PROBES_PER_TEMPLATE = 3`, `TAIL_N = 4`, stricter `_fired` (`ok is not True`), stderr telemetry | Previous promoted baseline. Gain over 61.555 is `2.54` points ~= 28 more successful unique cells. |
+| 67.365 | unknown | `lb_67_365_safe_conservative/` | Conservative deadline-aware (based on lb_64) | `MARGIN_S = 60.0`, `FILL_BUDGET_FRAC = 0.90`, `PROBES_PER_TEMPLATE = 1`, `SLOWEST0 = 30.0`, `TAIL_N = 4` | New promoted baseline. More conservative than lb_64 yet scored +3.27 higher: PROBES_PER_TEMPLATE 3→1 saved ~80s, larger cushion avoided late-stage stuck. Near K=1 physical ceiling (748 cells × 18/200 ≈ 67.5/row). |
 | 100.600 | 1 / unknown | external/top1 | unknown | unknown | Public top score observed by user. With the current single-post primitive, this would require about 1118 successful unique cells. |
 
 ## Scoring Math
@@ -36,13 +37,15 @@ Useful conversions:
 60.340 / 0.09 ~= 670 successful cells
 61.555 / 0.09 ~= 684 successful cells
 64.095 / 0.09 ~= 712 successful cells
+67.365 / 0.09 ~= 748 successful cells
 100.600 / 0.09 ~= 1118 successful cells
 ```
 
-So the promoted 64.095 run is roughly 28 successful cells better than the
-61.555 run, and ~1118 - 712 ~= 406 cells short of the public top score. The
-gain is throughput (template-rate selection, higher budget fraction, small
-tail), not a new attack primitive.
+So the promoted 67.365 run is roughly 36 successful cells better than the
+64.095 run, and ~1118 - 748 ~= 370 cells short of the public top score. The
+67.365 run is near the K=1 physical ceiling (replay 9000s / 12s per candidate
+= 750 max cells); breaking 100 requires higher per-candidate raw via multi-post
+(K=2 raw=34, K=3 raw=50), validated by the k2-prompt-probe experiment.
 
 ## Baseline Primitive
 
