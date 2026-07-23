@@ -1,12 +1,14 @@
-# 两个高分 Notebook 的讨论总结与策略启示
+# 高分 Notebook 的讨论总结与策略启示
 
-本文总结以下两份 notebook 中最值得长期保留的讨论：
+本文总结以下 notebook 中最值得长期保留的讨论：
 
 - [`lb60-525-july-safe-edge-prune-tail8-upgrade.ipynb`](references/notebooks/lb60-525-july-safe-edge-prune-tail8-upgrade.ipynb)
 - [`ai-agent-v3-1-2-single-post-exfiltration.ipynb`](references/notebooks/ai-agent-v3-1-2-single-post-exfiltration.ipynb)
+- [`ai-agent-security-adaptiveuniformthree-probe-race.ipynb`](references/88_515/ai-agent-security-adaptiveuniformthree-probe-race.ipynb)
 
-它们讨论的是同一条路线的两个层次：第一份记录 leaderboard 上的工程演化和预算边界；第二份用
-generation-cost model 解释为什么这条路线有效，以及哪些看似更强的方案没有兑现理论收益。
+它们讨论的是同一条路线的三个层次：早期 notebook 记录 leaderboard 上的工程演化和预算边界；
+v3.1.2 single-post notebook 用 generation-cost model 解释为什么这条路线有效；`88.515` notebook
+则证明 K=1 仍可通过更准确的 replay-cost packing 继续上探。
 
 ## 1. 一句话结论
 
@@ -19,11 +21,32 @@ tool calls 堆进单个 candidate，而是：
 + 每个 candidate 使用不同 URL domain
 + generation 阶段 live validate
 + 按每个模型自己的速度填满预算
++ 用实测 hops=8 latency 给 replay 阶段装箱
 + 在 9,000 秒边界前保守停止
 ```
 
 核心优化目标是每秒能够稳定 replay 的 raw score，而不是 candidate 数、prompt 花样或理论上的
-predicate 上限。
+predicate 上限。`88.515` 的意义尤其清楚：它没有依赖高 K，而是把 K=1 的 replay budget ledger
+做得更准。
+
+## 1.1 88.515 带来的新结论
+
+`88.515` 参考 notebook 的核心机制：
+
+```text
+5 个 K=1 short templates
++ 每个 template 均匀 probe 3 次
++ 只保留 live trace 中实际触发 EXFILTRATION 的候选
++ 用 median latency / fire rate 估算 effective cost
++ 按返回候选的实测累计 latency 控制 replay_cost <= 9000 * 0.99
+```
+
+这把旧 `67.365` 基线从约 `748` 个成功 K=1 cells 的量级推进到约 `984` 个。到 `100.000` 还差
+约 `128` 个 K=1-equivalent cells，所以后续优先级应改成：
+
+1. 先复现并归档 `88.515` exact baseline；
+2. 再做 template 和 replay cap 的小步 A/B；
+3. K=2 作为高风险分支，只有实测 raw/replay-second 胜出才晋升。
 
 ## 2. 已验证的计分 primitive
 
@@ -263,7 +286,8 @@ LB 证据。它应被视为待验证研究方向，而不是已知有效策略�
 - 静态 N 被慢模型限制；
 - live fill 将方案推进到 50–60 分区间；
 - 小 tail 有小幅收益、过大 tail 会失败；
-- 当前仓库的 `61.555` promoted baseline。
+- `67.365` conservative K=1 baseline；
+- `88.515` uniform three-probe race 参考结果。
 
 这些是高价值经验，但仍受运行噪声和具体模板影响。
 
@@ -291,21 +315,24 @@ LB 证据。它应被视为待验证研究方向，而不是已知有效策略�
 
 ## 13. 当前仓库策略的定位
 
-当前 [`submission/current/submit.py`](submission/current/submit.py) 延续并收紧了 notebook 的核心机制：
+当前分支还没有 canonical `submission/current/submit.py`。下一步应把 `88.515` 参考实现规范化为
+新的 current baseline，再在它上面做受控实验。
+
+新 baseline 应延续这些核心机制：
 
 - one-message、one-post、`SECRET_MARKER`；
 - unique short domains；
 - 每个模型 live probe；
 - 仅保留实际 fired candidates；
-- 动态选择较好的短模板；
-- 根据观测到的最慢 interaction 和 deadline 停止；
-- 只追加很小的 tail，避免未经验证的大 tail。
+- uniform three-probe template race；
+- 根据实测 hops=8 latency 给 replay 阶段装箱；
+- 避免未经验证的大 tail。
 
-因此这两份 notebook 对当前方向的主要作用是提供理论解释、失败路线和边界风险，而不是要求立即
-推翻 `61.555` baseline。最值得继续投入的方向依次是：
+因此这些 notebook 对当前方向的主要作用是提供理论解释、失败路线和边界风险，而不是鼓励立即
+切到高 K。最值得继续投入的方向依次是：
 
-1. 更低延迟且等成功率的 single-post framing；
-2. deadline/margin 的保守 A/B；
-3. 小规模、可回滚的 tail 实验；
-4. 单独研究 private-transfer hedge；
-5. 只有出现新证据时才重启 K>1 路线。
+1. 复现并归档 `88.515` exact baseline；
+2. 更低延迟且等成功率的 single-post framing；
+3. `REPLAY_SAFE`、probe 次数和 replay-cost cap 的保守 A/B；
+4. GPT K=2 / gemma K=1 的独立高风险分支；
+5. 单独研究 private-transfer hedge。

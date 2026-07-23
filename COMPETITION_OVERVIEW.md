@@ -1,7 +1,7 @@
 # AI Agent Security Competition：题目与评测机制
 
 > 本文是后续工作的题目速查表。内容以仓库中的 `aicomp-sdk 3.1.2`、托管
-> gateway 源码和公开 starter notebook 为依据，整理日期为 2026-07-10。
+> gateway 源码和公开 starter notebook 为依据，最近核对日期为 2026-07-22。
 > 如果 Kaggle 挂载版本更新，应优先重新核对 SDK，而不是继续沿用本文中的常数。
 
 官方页面：<https://www.kaggle.com/competitions/ai-agent-security-multi-step-tool-attacks/overview>
@@ -202,7 +202,7 @@ gemma_private
 | --- | ---: |
 | 每个模型的 candidates | 2,000 |
 | 每个 candidate 的 user messages | 32 |
-| 每条 user message 字符数 | 10,000 |
+| 每条 user message 字符数 | 2,000 |
 | 每次 `interact()` 的 tool hops | 8 |
 
 2,000 是序列化和回放上限，不是推荐目标。候选越慢，replay timeout 风险越高。

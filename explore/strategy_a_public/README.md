@@ -1,62 +1,44 @@
-# 策略 A: Public 冲刺
+# Strategy A: Historical Public Sprint
 
-## 目标
+This directory is an exploratory public-sprint branch, not the current baseline.
 
-最大化 public leaderboard 分数，冲 100+。
+## Current Status
 
-## 核心策略
+The previous README described a K-adaptive K=4/6/8 strategy. The current `submit.py` in this directory should not be treated as that confirmed design. It is closer to an aggressive K=1 live-validation branch:
 
-### K 自适应探测
+- one-message `SECRET_MARKER` exfiltration through `http.post`;
+- short `.co` domains;
+- live probing during `run()`;
+- a hard cap around the returned candidate count;
+- broad success detection based on successful tool calls in parts of the flow.
 
-```
-Probe K=8 (120s budget)
-  → 成功率 ≥75%? → 使用 K=8
-  → 否则 Probe K=6
-    → 成功率 ≥75%? → 使用 K=6
-    → 否则使用 K=4 (proven baseline)
-```
+Because the new external `88.515` reference already beats the old K=1 baseline with cleaner replay accounting, this branch should not be copied directly into `submission/current/submit.py`.
 
-每个 K 值的 per-candidate 贡献:
-- K=1: 16 + 2 = 18 raw
-- K=4: 64 + 2 = 66 raw
-- K=6: 96 + 2 = 98 raw
-- K=8: 128 + 2 = 130 raw
+## Relationship To The New Baseline
 
-### 预算分配
+The current mainline should be:
 
-| 阶段 | 预算 | 预期 candidates | 预期分数 |
-|------|:----:|:---------------:|:--------:|
-| K-adaptive probing | 120s | — | — |
-| MARKER (95%) | 8550s | 250-370 | ~100-120 |
-| CD bonus (5%) | 450s | 40-80 | +2-3 |
-| **Total** | | | **~100-130** |
-
-### v4 提速优化
-
-- 短模板 (~2 行 vs 5 行)
-- "No analysis. No reasoning. No explanation." 后缀
-- 1 probe per template (vs 2-3)
-- 紧凑 margin (MARGIN_S=35, SLOWEST0=25)
-- 预期提速 ~30% → 从 85 提到 ~120
-
-## 理论分数 (K=4 + v4提速)
-
-```
-t_fixed=5s, t_call=7.5s, v4 speedup=30%
-t_cand = (5 + 4×7.5) × 0.7 = 24.5s
-N = 8550 / 24.5 = 349 candidates
-Score = 349 × 66 / 200 = 115.2
+```text
+88.515 uniform three-probe K=1 baseline
+  -> exact archive/control
+  -> one-variable A/B tests toward 100.00
 ```
 
-## 关键约束
+This strategy can still contribute ideas after the control is restored:
 
-- SECRET_MARKER 含 "secret" → private guardrail 几乎肯定拦截
-- max_tool_hops = 8 → K=8 是极限
-- K=8 风险: 模型可能无法完成 8 次 http.post
-- MAX_REPLAY_FINDINGS = 2000 → 不会超限
+- tighter prompt wording;
+- reduced probe overhead;
+- public-only replay cap experiments.
 
-## 使用
+Any useful change should be ported into the `88.515` framework and tested as a single variable.
 
-```bash
-cp explore/strategy_a_public/submit.py submission/current/submit.py
-```
+## Risks
+
+- K=4/6/8 is not confirmed by this directory.
+- gemma has not shown reliable high-K behavior.
+- broad `successful_tool_calls` validation is less precise than checking trace-level `http.post` with `SECRET_MARKER`.
+- aggressive caps may gain score or may push replay over the hosted timeout boundary.
+
+## Usage
+
+Do not submit this branch directly unless intentionally testing it as a separate experiment. The preferred next submission source should be restored from the `88.515` baseline first.

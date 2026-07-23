@@ -4,7 +4,7 @@ Historical public leaderboard result reported by user: `61.555`.
 
 Public rank at the time: `106 / 1688`.
 
-This is the current promoted baseline.
+This was a promoted baseline before the later `67.365` and `88.515` results.
 
 Key traits:
 

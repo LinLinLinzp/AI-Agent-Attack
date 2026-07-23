@@ -2,7 +2,7 @@
 
 This workspace is organized around two active workflows:
 
-- `submission/current/`: the current Kaggle submission package.
+- `submission/current/`: the current Kaggle submission candidates and handoff notes.
 - `validation/`: local/Kaggle validation and template mining.
 
 Reference material and large assets are kept separate so old notebooks are not mistaken for the active submission.
@@ -10,10 +10,11 @@ Reference material and large assets are kept separate so old notebooks are not m
 ## Directory Map
 
 ```text
-submission/current/      Current submit.py source and submission notebook.
+submission/current/      Current candidate sources and submission notebook context.
 submission/archive/      Saved historical submission states.
 validation/              Local validation notebook, probe plans, and results.
 references/notebooks/    Official, LB, and working reference notebooks.
+references/88_515/       External 88.515 public LB reference notebook.
 references/sdk/          Competition SDK archive and extracted SDK.
 models/                  Local model archives.
 scratch/                 Temporary experiments.
@@ -21,12 +22,13 @@ scratch/                 Temporary experiments.
 
 ## Current Submission
 
-Use these files when preparing a Kaggle submission:
+Current working baseline:
 
-- `submission/current/submit.py`
-- `submission/current/getting-started-notebook.ipynb`
+- Public LB `88.965`, from `submission/current/v88_515_plus_gpt_k2_probe/submit.py`.
+- Strategy: model-aware GPT K2 / gemma K1 probe built from the external `88.515` reference strategy.
+- Goal for the next round: use the two remaining submissions to move toward `100.00` first, then the observed ~`110` public ceiling.
 
-The current attack strategy is a ShadowCat-style live validation-fill loop: it probes the live environment, keeps only candidates that actually fire `http.post(data=SECRET_MARKER)`, and stops before the budget edge.
+Important repo-state note: `submission/current/submit.py` is intentionally not used for this round. The next run compares `V38` and `V39`, with sources under `submission/current/v38_*` and `submission/current/v39_*`; see `submission/current/TWO_REMAINING_SUBMISSION_PLAN.md`. Copy one variant at a time into the Kaggle notebook writer cell that creates `/kaggle/working/attack.py`. Future submissions should keep this submit-number prefix convention. The existing `submission/current/getting-started-notebook.ipynb` is legacy context and is not currently synchronized with the candidate sources.
 
 ## Validation Workflow
 
