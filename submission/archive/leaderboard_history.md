@@ -19,6 +19,8 @@ archive snapshots here when a submission teaches us something useful.
 | timeout | n/a | `timeout_v88_515_exact_control_2026_07_22/` | Exact `88.515` control resubmission | Unchanged exact-control source with `REPLAY_SAFE = 0.99` and nominal 90s replay margin | Invalid due to timeout. Root suspicion: replay cap too tight for current environment variance; any follow-up should lower replay safe before changing templates. |
 | 86.720 | unknown | `lb_86_720_v88_515_plus_k1_safe_speed/` | K=1 safe-speed variant | Adds `inj_data_first`, strict exact-URL validation, successful-latency fill estimate, and slower probe-bank filtering; still uses `REPLAY_SAFE = 0.99` | Finished but scored below the external `88.515` reference. Likely lost returned volume from stricter validation/pruning; do not promote as mainline. |
 | 88.965 | unknown | `lb_88_965_v88_515_plus_gpt_k2_probe/` | GPT K2 / gemma K1 model-aware probe | Keeps B's strict validation; GPT can select K2 `inj_list`/`inj_force` by measured raw/sec; gemma stays K1; K2 path uses `K2_REPLAY_SAFE = 0.985` | New best local submitted result. Beats B by `2.245` points and the external 88.515 reference by `0.450`, but without stderr telemetry we cannot prove how much came from K2 versus selection/replay-safety behavior. Promote as current reproducible public baseline. |
+| timeout | n/a | pending archive | V38 hybrid C K2 + original K1 safe | Restores original-style K1 volume while keeping C's GPT K2 branch | Timed out. This rejects the current V38 replay/cap mix; do not use it as the next baseline. |
+| 69.454 | unknown | pending archive | V39 GPT K3/K2 aggressive | Adds GPT K3 templates and stronger high-K selection bias with gemma K1 fallback | Scored far below C. Treat broad K3/K2 raw-density as unstable until hosted telemetry proves otherwise. |
 | 100.600 | 1 / unknown | external/top1 | unknown | unknown | Public top score observed by user. With the current single-post primitive, this would require about 1118 successful unique cells. |
 | ~110 | unknown | external/top score | unknown | unknown | New public ceiling observed by user after C returned. From `88.965`, a `110.000` target would need about `233` additional K=1-equivalent cells, so high-K GPT density is likely required. |
 
@@ -95,10 +97,21 @@ The completed 2026-07-22 three-variant results:
 - `v88_515_plus_k1_safe_speed`: public LB `86.720`.
 - `v88_515_plus_gpt_k2_probe`: public LB `88.965`, current best local result.
 
-The two remaining 2026-07-22 follow-ups prepared from C:
+The two 2026-07-22 follow-ups prepared from C:
 
-- `V38` / `v38_hybrid_c_k2_plus_original_k1_safe`: recover original-style K1 volume while keeping GPT K2; expected `89-94`.
-- `V39` / `v39_gpt_k3_k2_aggressive`: test GPT K3/K2 raw-density; high variance `88-100`, upside `105-112`.
+- `V38` / `v38_hybrid_c_k2_plus_original_k1_safe`: timed out.
+- `V39` / `v39_gpt_k3_k2_aggressive`: public LB `69.454`.
+
+The current pending follow-ups:
+
+- `V40` / `v40_multimessage_k1_batching`: tests continuation/batched K1 economics.
+- `V41` / `v41_gpt_harmony_prefill_probe`: tests GPT harmony/prefill throughput with gemma K1 fallback.
+
+The public Kaggle writeup
+["The Scored Attack Surface Collapses to a Single Predicate"](https://www.kaggle.com/writeups/canqiang/the-scored-attack-surface-collapses-to-a-single-pr)
+agrees with the local reachability reading: public scoring is mostly clean
+`http.post(data=SECRET_MARKER)` throughput plus unique-domain cell count.
+Continuation and multi-post stacking are runtime-dependent, not guaranteed wins.
 
 Future current submission directories should use the submit attempt number first,
 for example `v40_strategy_name/`, and notes should refer to the matching

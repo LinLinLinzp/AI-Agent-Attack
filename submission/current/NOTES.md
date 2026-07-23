@@ -11,7 +11,7 @@ The next working baseline is the public LB `88.515` reference notebook:
 - Public score observed in the saved page: `88.515`
 - Core strategy: K=1 single-post `SECRET_MARKER` exfiltration with a uniform three-probe template race and measured replay-cost packing.
 
-Important operational note: there is still no single canonical `submission/current/submit.py` on this branch. For the two remaining submissions, copy `V38` or `V39` from the numbered `v38_*` / `v39_*` sources into the Kaggle notebook writer cell that creates `/kaggle/working/attack.py`.
+Important operational note: there is still no single canonical `submission/current/submit.py` on this branch. For active submissions, copy one numbered variant source from `submission/current/vNN_*` into the Kaggle notebook writer cell that creates `/kaggle/working/attack.py`.
 
 Result update: the unchanged local `v88_515_exact_control` resubmission timed
 out on 2026-07-22. Keep the external `88.515` result as a strategy reference,
@@ -23,9 +23,9 @@ Follow-up result update: the two experiment variants finished with public LB
 `v88_515_plus_gpt_k2_probe`. The GPT K2 / gemma K1 variant is now the best
 local submitted result.
 
-Next submission update: the remaining two slots are `V38` and `V39`. They
-should use the `88.965` baseline follow-ups documented in
-`submission/current/TWO_REMAINING_SUBMISSION_PLAN.md`.
+V38/V39 result update: `V38` timed out and `V39` scored `69.454`. Keep C
+(`88.965`) as the current best local submitted baseline. V40/V41 are the active
+pending follow-ups documented in `submission/current/V40_V41_SUBMISSION_PLAN.md`.
 
 ## Baseline Mechanics
 
@@ -62,12 +62,18 @@ The key lesson is that K=1 still has room when replay sizing is more accurate. T
 - `v88_515_plus_gpt_k2_probe/submit.py`: GPT K2 / gemma K1 high-risk probe.
 - `v38_hybrid_c_k2_plus_original_k1_safe/submit.py`: V38; C's GPT K2 branch plus original-style K1 volume recovery.
 - `v39_gpt_k3_k2_aggressive/submit.py`: V39; GPT K3/K2 high-density probe with gemma K1 fallback.
+- `v40_multimessage_k1_batching/submit.py`: V40; tests whether several stable K1 user turns can share one replay reset profitably.
+- `v41_gpt_harmony_prefill_probe/submit.py`: V41; tests GPT-OSS harmony/prefill tool-call shapes with gemma K1 fallback.
 
 Current result status:
 
 - `v88_515_exact_control`: timed out on 2026-07-22; archived at `submission/archive/timeout_v88_515_exact_control_2026_07_22/`; do not resubmit unchanged.
 - `v88_515_plus_k1_safe_speed`: public LB `86.720`; finished but did not promote. Exact URL validation plus probe-bank pruning likely reduced returned volume.
 - `v88_515_plus_gpt_k2_probe`: public LB `88.965`; current best local submitted result. K1 path uses `K1_REPLAY_SAFE = 0.99`, K2 path uses `K2_REPLAY_SAFE = 0.985`.
+- `v38_hybrid_c_k2_plus_original_k1_safe`: timed out; not replay-stable enough.
+- `v39_gpt_k3_k2_aggressive`: public LB `69.454`; high-K density failed in hosted scoring.
+- `v40_multimessage_k1_batching`: pending.
+- `v41_gpt_harmony_prefill_probe`: pending.
 
 The previous current sweep has been archived:
 
@@ -109,11 +115,11 @@ Priority order after the exact-control timeout and B/C results:
 
 1. Do not resubmit `v88_515_exact_control` unchanged.
 2. Promote `v88_515_plus_gpt_k2_probe` (`88.965`) as the current reproducible public baseline.
-3. Submit the two C follow-ups in `TWO_REMAINING_SUBMISSION_PLAN.md`:
-   - V38: `v38_hybrid_c_k2_plus_original_k1_safe`, expected `89-94`.
-   - V39: `v39_gpt_k3_k2_aggressive`, expected high variance `88-100`, upside `105-112`.
-4. If V38 wins, tune K1/K2 replay caps and template order around the C/V38 hybrid.
-5. If V39 wins, promote GPT K3/K2 and narrow the high-K template set before trying K4.
+3. Treat V38 timeout and V39 `69.454` as negative evidence for broad high-K replay packing.
+4. Use V40/V41 to test two narrower hypotheses:
+   - V40: continuation/batched K1 may save reset overhead if hosted continuation is cheap enough.
+   - V41: GPT harmony/prefill may reduce reasoning-row latency without harming gemma.
+5. If both V40 and V41 fall below C, build V42 as a conservative C-derived K1/K2 throughput variant rather than increasing K.
 6. Treat CD/private hedge work as secondary. CD wording must avoid `send`, `email`, and `upload` in the final user message, or the predicate will not fire.
 7. Name future variants by submit attempt number first, e.g. `v40_strategy_name/`, with notes using the uppercase label `V40`.
 
@@ -139,6 +145,8 @@ python3 -m py_compile submission/current/v88_515_plus_k1_safe_speed/submit.py
 python3 -m py_compile submission/current/v88_515_plus_gpt_k2_probe/submit.py
 python3 -m py_compile submission/current/v38_hybrid_c_k2_plus_original_k1_safe/submit.py
 python3 -m py_compile submission/current/v39_gpt_k3_k2_aggressive/submit.py
+python3 -m py_compile submission/current/v40_multimessage_k1_batching/submit.py
+python3 -m py_compile submission/current/v41_gpt_harmony_prefill_probe/submit.py
 ```
 
 Do not submit from the legacy notebook by accident; copy the intended variant source into the writer cell each time.

@@ -7,9 +7,9 @@ This workspace is for the Kaggle competition **AI Agent Security - Multi-Step To
 Current branch state:
 
 - Branch: `trae-dev`
-- Working tree now has Markdown updates plus the completed A/B/C submission round and two new C-based follow-up variants
+- Working tree now has Markdown updates plus the completed A/B/C and V38/V39 rounds, with V40/V41 pending scoring
 - New reference material: `references/88_515/` is untracked and contains the external `88.515` public LB notebook/page
-- Canonical submission source: `submission/current/submit.py` is intentionally not used for the next round; use `V38` or `V39` from `submission/current/v38_*` / `submission/current/v39_*` for the remaining submissions
+- Canonical submission source: `submission/current/submit.py` is intentionally not used for the next round; use numbered variant directories such as `submission/current/v40_*` / `submission/current/v41_*`
 
 Current active files:
 
@@ -20,11 +20,14 @@ Current active files:
 - `references/88_515/ai-agent-security-adaptiveuniformthree-probe-race.ipynb`: new `88.515` public LB reference.
 - `submission/current/THREE_SUBMISSION_PLAN.md`: historical paths, intent, expected score, and interpretation rules for the completed three parallel submissions.
 - `submission/current/TWO_REMAINING_SUBMISSION_PLAN.md`: paths, intent, expected score, and interpretation rules for the two remaining `88.965` follow-up submissions.
+- `submission/current/V40_V41_SUBMISSION_PLAN.md`: current V40/V41 paths, experiment purpose, expected score ranges, and result interpretation.
 - `submission/current/v88_515_exact_control/submit.py`: exact `88.515` control source.
 - `submission/current/v88_515_plus_k1_safe_speed/submit.py`: K=1 safe-speed variant.
 - `submission/current/v88_515_plus_gpt_k2_probe/submit.py`: GPT K2 / gemma K1 probe.
 - `submission/current/v38_hybrid_c_k2_plus_original_k1_safe/submit.py`: V38, C-based hybrid that restores original-style K1 volume while keeping GPT K2.
 - `submission/current/v39_gpt_k3_k2_aggressive/submit.py`: V39, C-based aggressive GPT K3/K2 raw-density probe.
+- `submission/current/v40_multimessage_k1_batching/submit.py`: V40, continuation/batched K1 probe.
+- `submission/current/v41_gpt_harmony_prefill_probe/submit.py`: V41, GPT harmony/prefill probe with gemma K1 fallback.
 - `references/sdk/sdk_extracted/`: local extracted SDK used for inspection and deterministic checks.
 
 ## New Baseline
@@ -56,6 +59,8 @@ Latest known public leaderboard results:
 | `88.515` | new agreed baseline reference: uniform three-probe race + measured replay cap |
 | `86.720` | K1 safe-speed variant; finished but underperformed the 88.515 reference |
 | `88.965` | GPT K2 / gemma K1 probe; current best local submitted result |
+| `timeout` | V38 hybrid C K2 + original K1 safe; not replay-stable |
+| `69.454` | V39 GPT K3/K2 aggressive; high-K density failed in hosted scoring |
 | `~110` | public top score observed by user after C returned; target direction |
 
 Single-post scoring remains:
@@ -81,17 +86,19 @@ So the new gap to `100.000` is about `123` K=1-equivalent cells, and the gap to 
 The main path is now:
 
 1. Keep `v88_515_plus_gpt_k2_probe` (`88.965`) as the current reproducible local public baseline.
-2. Submit `V38` (`v38_hybrid_c_k2_plus_original_k1_safe`) to test whether C can recover K1 volume while retaining GPT K2.
-3. Submit `V39` (`v39_gpt_k3_k2_aggressive`) to test whether GPT K3/K2 raw-density can move toward 100+ and the observed ~110 ceiling.
+2. Treat V38 timeout and V39 `69.454` as evidence against broad/high-K replay packing without stronger hosted calibration.
+3. Use V40/V41 as narrower tests: V40 tests continuation batching economics, and V41 tests whether GPT harmony/prefill can compress the reasoning row.
+4. If V40/V41 do not beat `88.965`, return to C and make a conservative V42 around K1/K2 throughput rather than increasing K.
 
 Candidate priorities:
 
 - Timed-out control: `v88_515_exact_control`, do not resubmit unchanged.
 - K1 experiment: `v88_515_plus_k1_safe_speed`, public LB `86.720`, did not promote.
 - Current reproducible baseline: `v88_515_plus_gpt_k2_probe`, public LB `88.965`.
-- Next V38 submission: `v38_hybrid_c_k2_plus_original_k1_safe`, expected `89-94`.
-- Next V39 submission: `v39_gpt_k3_k2_aggressive`, high variance `88-100`, upside `105-112`.
-- Later A/B: based on whether V38 or V39 wins; use `TWO_REMAINING_SUBMISSION_PLAN.md`.
+- Failed V38 submission: `v38_hybrid_c_k2_plus_original_k1_safe`, timed out.
+- Failed V39 submission: `v39_gpt_k3_k2_aggressive`, public LB `69.454`.
+- Pending V40 submission: `v40_multimessage_k1_batching`, expected high variance `80-93`, upside if continuation is cheap.
+- Pending V41 submission: `v41_gpt_harmony_prefill_probe`, expected high variance `86-94`, upside if GPT harmony/prefill selection is reliable.
 - Private hedge: only after public baseline is stable; CD wording must avoid `send`, `email`, and `upload`.
 
 Avoid treating K=4/K=6/K=8 projections as confirmed. The current evidence says GPT can sometimes do K=2/K=3, gemma generally cannot, and a prior K3 blend scored badly.
@@ -100,7 +107,7 @@ Avoid treating K=4/K=6/K=8 projections as confirmed. The current evidence says G
 
 Before submitting on Kaggle:
 
-- Pick exactly one numbered variant, currently `submission/current/v38_*` or `submission/current/v39_*`, for the next Kaggle run.
+- Pick exactly one numbered variant, currently `submission/current/v40_*` or `submission/current/v41_*` while those are under test.
 - Run `python3 -m py_compile` on the chosen variant.
 - Copy the full source into the Kaggle notebook writer cell that creates `/kaggle/working/attack.py`.
 - Do not rely on `submission/current/getting-started-notebook.ipynb`; it is legacy context and is not synchronized with the current candidates.
@@ -142,4 +149,5 @@ Latest 2026-07-22 result interpretation:
 - Exact `88.515` control timed out, so `REPLAY_SAFE = 0.99` is not replay-stable enough in the current hosted environment.
 - B (`v88_515_plus_k1_safe_speed`) scored `86.720`; stricter K1 validation/pruning likely reduced returned volume.
 - C (`v88_515_plus_gpt_k2_probe`) scored `88.965`; promote it as the current local public baseline, but run a cleaner follow-up to separate K2 value from replay-safety and template-selection effects.
-- V38/V39 are now prepared from C for the two remaining submissions.
+- V38 timed out; V39 scored `69.454`. The immediate lesson is that aggressive K recovery and K3/K2 density are not replay-stable enough as implemented.
+- The Kaggle writeup ["The Scored Attack Surface Collapses to a Single Predicate"](https://www.kaggle.com/writeups/canqiang/the-scored-attack-surface-collapses-to-a-single-pr) matches the local SDK reading: public scoring is dominated by clean `http.post(data=SECRET_MARKER)` throughput, while continuation/multi-post stacking is an empirical runtime trade-off rather than a guaranteed improvement.
