@@ -12,6 +12,7 @@ Kaggle本地validation环境的实验记录。每次实验记录目的、结果�
 | 2026-07-15 | [uta-predicate-probe](uta-predicate-probe/) | [results.md](uta-predicate-probe/results.md) | done |
 | 2026-07-15 | [method-comparison](method-comparison/) | [results.md](method-comparison/results.md) | done |
 | 2026-07-15 | [trace-guided-v2](trace-guided-v2/) | [results.md](trace-guided-v2/results.md) | done |
+| 2026-07-25 | [final-two-slots-probe](final-two-slots-probe/) | probe notebook for V49/V50 sizing | ready |
 
 ## 关键发现
 

@@ -11,6 +11,8 @@ Recent negative evidence:
 ```text
 V38 = timeout
 V39 = 69.454 public LB
+V40 = 77.625 public LB
+V41 = 78.135 public LB
 ```
 
 The public writeup
@@ -25,7 +27,7 @@ on hosted replay latency and reliability.
 Path:
 
 ```text
-submission/current/v40_multimessage_k1_batching/submit.py
+submission/archive/lb_77_625_v40_multimessage_k1_batching/submit.py
 ```
 
 Experiment:
@@ -59,7 +61,7 @@ Interpretation:
 Path:
 
 ```text
-submission/current/v41_gpt_harmony_prefill_probe/submit.py
+submission/archive/lb_78_135_v41_gpt_harmony_prefill_probe/submit.py
 ```
 
 Experiment:
@@ -89,7 +91,6 @@ Interpretation:
 
 ## Next Step After Results
 
-If either V40 or V41 breaks into the mid-90s, use it as the new numbered baseline
-and tune only one variable at a time. If both fail, promote C again and make V42
-a conservative throughput build: K1 plus narrowly validated GPT K2, no K3, no
-batch3, and more replay headroom.
+Both V40 and V41 fell well below C. Promote C again and use the V42/V43/V44
+three-way plan: compressed GPT K1/K2, conservative selected-only C packing, and
+replay-safe K1-only reference.

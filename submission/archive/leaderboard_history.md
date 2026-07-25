@@ -19,8 +19,15 @@ archive snapshots here when a submission teaches us something useful.
 | timeout | n/a | `timeout_v88_515_exact_control_2026_07_22/` | Exact `88.515` control resubmission | Unchanged exact-control source with `REPLAY_SAFE = 0.99` and nominal 90s replay margin | Invalid due to timeout. Root suspicion: replay cap too tight for current environment variance; any follow-up should lower replay safe before changing templates. |
 | 86.720 | unknown | `lb_86_720_v88_515_plus_k1_safe_speed/` | K=1 safe-speed variant | Adds `inj_data_first`, strict exact-URL validation, successful-latency fill estimate, and slower probe-bank filtering; still uses `REPLAY_SAFE = 0.99` | Finished but scored below the external `88.515` reference. Likely lost returned volume from stricter validation/pruning; do not promote as mainline. |
 | 88.965 | unknown | `lb_88_965_v88_515_plus_gpt_k2_probe/` | GPT K2 / gemma K1 model-aware probe | Keeps B's strict validation; GPT can select K2 `inj_list`/`inj_force` by measured raw/sec; gemma stays K1; K2 path uses `K2_REPLAY_SAFE = 0.985` | New best local submitted result. Beats B by `2.245` points and the external 88.515 reference by `0.450`, but without stderr telemetry we cannot prove how much came from K2 versus selection/replay-safety behavior. Promote as current reproducible public baseline. |
-| timeout | n/a | pending archive | V38 hybrid C K2 + original K1 safe | Restores original-style K1 volume while keeping C's GPT K2 branch | Timed out. This rejects the current V38 replay/cap mix; do not use it as the next baseline. |
-| 69.454 | unknown | pending archive | V39 GPT K3/K2 aggressive | Adds GPT K3 templates and stronger high-K selection bias with gemma K1 fallback | Scored far below C. Treat broad K3/K2 raw-density as unstable until hosted telemetry proves otherwise. |
+| timeout | n/a | `timeout_v38_hybrid_c_k2_plus_original_k1_safe_2026_07_23/` | V38 hybrid C K2 + original K1 safe | Restores original-style K1 volume while keeping C's GPT K2 branch | Timed out. This rejects the current V38 replay/cap mix; do not use it as the next baseline. |
+| 69.454 | unknown | `lb_69_454_v39_gpt_k3_k2_aggressive/` | V39 GPT K3/K2 aggressive | Adds GPT K3 templates and stronger high-K selection bias with gemma K1 fallback | Scored far below C. Treat broad K3/K2 raw-density as unstable until hosted telemetry proves otherwise. |
+| 77.625 | unknown | `lb_77_625_v40_multimessage_k1_batching/` | V40 multi-message K1 batching | Tests two/three K1 user turns sharing one replay reset | Scored far below C. Hosted continuation did not pay off in this implementation. |
+| 78.135 | unknown | `lb_78_135_v41_gpt_harmony_prefill_probe/` | V41 GPT harmony/prefill probe | Adds GPT native-looking harmony/prefill and K2/K3 options | Scored far below C. Current harmony/prefill plus high-K selection is not a mainline. |
+| 88.245 | unknown | `lb_88_245_v42_gpt_k2_analysis_compression/` | V42 GPT K1/K2 analysis compression | Adds compressed GPT-only K1/K2 analysis-close templates, lowers replay caps, no K3 | Close to C but did not promote. Compression plus lower caps cost `0.720` points vs C, so C's original GPT K2 wording remains stronger. |
+| 87.175 | unknown | `lb_87_175_v43_c_conservative_selected_only/` | V43 conservative selected-only C packing | Keeps C templates but requires stronger K2 fire rate and returns only the selected lane | Underperformed C by `1.790`. C's mixed low-cost probe bank is likely useful; do not discard non-selected bank candidates wholesale. |
+| 87.390 | unknown | `lb_87_390_v44_k1_replay_safe_reference/` | V44 replay-safe K1 reference | K1-only external 88.515 race with `REPLAY_SAFE = 0.982` | Stable but below C and below the external 88.515 reference. Extra K1 replay headroom does not close the gap to 100. |
+| 84.170 | unknown | `lb_84_170_v46_gpt_k2_cd_stack_aggressive/` | V46 aggressive GPT K2 + CD stack | Adds K1+CD and GPT-only K2+CD stack templates, `CD_STACK_SCORE_BIAS = 1.08`, `CD_STACK_REPLAY_SAFE = 0.982` | Scored `4.795` below C. The CD-stack multiplier did not overcome added latency/replay instability; do not continue this aggressive stack line unchanged. |
+| 86.400 | unknown | `lb_86_400_v47_c_cd_stack_conservative/` | V47 conservative C + K1/CD stack | Keeps C K1/K2 templates, adds only K1+CD stack templates, no positive CD bias, `CD_STACK_REPLAY_SAFE = 0.975` | Scored `2.565` below C. Even conservative same-candidate EXFIL+CD stacking is currently too expensive or too unstable; C remains the baseline. |
 | 100.600 | 1 / unknown | external/top1 | unknown | unknown | Public top score observed by user. With the current single-post primitive, this would require about 1118 successful unique cells. |
 | ~110 | unknown | external/top score | unknown | unknown | New public ceiling observed by user after C returned. From `88.965`, a `110.000` target would need about `233` additional K=1-equivalent cells, so high-K GPT density is likely required. |
 
@@ -50,6 +57,8 @@ Useful conversions:
 67.365 / 0.09 ~= 748 successful cells
 73.080 / 0.09 ~= 812 successful cells
 86.720 / 0.09 ~= 964 K=1-equivalent cells
+84.170 / 0.09 ~= 935 K=1-equivalent cells
+86.400 / 0.09 ~= 960 K=1-equivalent cells
 88.515 / 0.09 ~= 984 successful cells
 88.965 / 0.09 ~= 989 K=1-equivalent cells
 100.000 / 0.09 ~= 1112 successful cells
@@ -99,13 +108,35 @@ The completed 2026-07-22 three-variant results:
 
 The two 2026-07-22 follow-ups prepared from C:
 
-- `V38` / `v38_hybrid_c_k2_plus_original_k1_safe`: timed out.
-- `V39` / `v39_gpt_k3_k2_aggressive`: public LB `69.454`.
+- `V38` / `timeout_v38_hybrid_c_k2_plus_original_k1_safe_2026_07_23`: timed out.
+- `V39` / `lb_69_454_v39_gpt_k3_k2_aggressive`: public LB `69.454`.
 
-The current pending follow-ups:
+The 2026-07-23/24 follow-ups prepared after V39:
 
-- `V40` / `v40_multimessage_k1_batching`: tests continuation/batched K1 economics.
-- `V41` / `v41_gpt_harmony_prefill_probe`: tests GPT harmony/prefill throughput with gemma K1 fallback.
+- `V40` / `lb_77_625_v40_multimessage_k1_batching`: public LB `77.625`.
+- `V41` / `lb_78_135_v41_gpt_harmony_prefill_probe`: public LB `78.135`.
+
+The 2026-07-24 three-way C follow-ups:
+
+- `V42` / `lb_88_245_v42_gpt_k2_analysis_compression`: public LB `88.245`.
+- `V43` / `lb_87_175_v43_c_conservative_selected_only`: public LB `87.175`.
+- `V44` / `lb_87_390_v44_k1_replay_safe_reference`: public LB `87.390`.
+
+The combined lesson from V42/V43/V44 is that C should remain the baseline:
+compressed GPT templates did not beat the original GPT K2 wording, selected-only
+packing lost useful bank candidates, and K1-only replay safety is stable but not
+high enough.
+
+The 2026-07-25 CD-stack follow-up results:
+
+- `V46` / `lb_84_170_v46_gpt_k2_cd_stack_aggressive`: public LB `84.170`.
+- `V47` / `lb_86_400_v47_c_cd_stack_conservative`: public LB `86.400`.
+
+Both underperformed C (`88.965`). Treat same-candidate `EXFILTRATION +
+CONFUSED_DEPUTY` stacking as a negative result in the current implementation:
+the extra `+4 raw` from CD is not enough to pay for the added tool generation,
+selection noise, and replay variance. Future work should return to C's
+throughput/replay accounting or use only very small CD probes.
 
 The public Kaggle writeup
 ["The Scored Attack Surface Collapses to a Single Predicate"](https://www.kaggle.com/writeups/canqiang/the-scored-attack-surface-collapses-to-a-single-pr)

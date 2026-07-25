@@ -23,9 +23,17 @@ Follow-up result update: the two experiment variants finished with public LB
 `v88_515_plus_gpt_k2_probe`. The GPT K2 / gemma K1 variant is now the best
 local submitted result.
 
-V38/V39 result update: `V38` timed out and `V39` scored `69.454`. Keep C
-(`88.965`) as the current best local submitted baseline. V40/V41 are the active
-pending follow-ups documented in `submission/current/V40_V41_SUBMISSION_PLAN.md`.
+V38/V39 result update: `V38` timed out and `V39` scored `69.454`.
+
+V40/V41 result update: `V40` scored `77.625` and `V41` scored `78.135`.
+
+V42/V43/V44 result update: `V42` scored `88.245`, `V43` scored `87.175`, and
+`V44` scored `87.390`. Keep C / `v88_515_plus_gpt_k2_probe` (`88.965`) as the
+current best local submitted baseline.
+
+V46/V47 result update: `V46` scored `84.170` and `V47` scored `86.400`. Both
+same-candidate EXFIL + CD stack variants underperformed C, so CD stacking should
+not remain the public-score mainline.
 
 ## Baseline Mechanics
 
@@ -60,20 +68,46 @@ The key lesson is that K=1 still has room when replay sizing is more accurate. T
 - `v88_515_exact_control/submit.py`: exact `88.515` control reference.
 - `v88_515_plus_k1_safe_speed/submit.py`: K=1 safe-speed variant; main expected improvement path.
 - `v88_515_plus_gpt_k2_probe/submit.py`: GPT K2 / gemma K1 high-risk probe.
-- `v38_hybrid_c_k2_plus_original_k1_safe/submit.py`: V38; C's GPT K2 branch plus original-style K1 volume recovery.
-- `v39_gpt_k3_k2_aggressive/submit.py`: V39; GPT K3/K2 high-density probe with gemma K1 fallback.
-- `v40_multimessage_k1_batching/submit.py`: V40; tests whether several stable K1 user turns can share one replay reset profitably.
-- `v41_gpt_harmony_prefill_probe/submit.py`: V41; tests GPT-OSS harmony/prefill tool-call shapes with gemma K1 fallback.
+- `v42_gpt_k2_analysis_compression/submit.py`: V42; public LB `88.245`; completed, did not promote.
+- `v43_c_conservative_selected_only/submit.py`: V43; public LB `87.175`; completed, did not promote.
+- `v44_k1_replay_safe_reference/submit.py`: V44; public LB `87.390`; completed, did not promote.
+- `v45_c_cd_stack_conservative/submit.py`: V45; superseded because the V45 Kaggle slot was accidentally used by another V44 submission. Do not submit this as V45.
+- `v46_gpt_k2_cd_stack_aggressive/submit.py`: V46; public LB `84.170`; completed, did not promote.
+- `v47_c_cd_stack_conservative/submit.py`: V47; public LB `86.400`; completed, did not promote.
+- `v48_replay_cost_tax_fix/submit.py`: V48; ready to submit; starts from C, uses hop-1 K1 fill charged by full-hop replay cost, and keeps C's near-selected mixed bank.
+- `v49_probe_emit_safe/submit.py`: V49; ready to submit; probes current row, estimates replay unit conservatively, then emits a larger K1 portfolio.
+- `v50_probe_emit_aggressive/submit.py`: V50; ready to submit; same probe-to-emit idea, sized closer to the replay edge.
+
+Archived completed numbered variants:
+
+- `submission/archive/timeout_v38_hybrid_c_k2_plus_original_k1_safe_2026_07_23/submit.py`: V38 timeout.
+- `submission/archive/lb_69_454_v39_gpt_k3_k2_aggressive/submit.py`: V39 public LB `69.454`.
+- `submission/archive/lb_77_625_v40_multimessage_k1_batching/submit.py`: V40 public LB `77.625`.
+- `submission/archive/lb_78_135_v41_gpt_harmony_prefill_probe/submit.py`: V41 public LB `78.135`.
+- `submission/archive/lb_88_245_v42_gpt_k2_analysis_compression/submit.py`: V42 public LB `88.245`.
+- `submission/archive/lb_87_175_v43_c_conservative_selected_only/submit.py`: V43 public LB `87.175`.
+- `submission/archive/lb_87_390_v44_k1_replay_safe_reference/submit.py`: V44 public LB `87.390`.
+- `submission/archive/lb_84_170_v46_gpt_k2_cd_stack_aggressive/submit.py`: V46 public LB `84.170`.
+- `submission/archive/lb_86_400_v47_c_cd_stack_conservative/submit.py`: V47 public LB `86.400`.
 
 Current result status:
 
 - `v88_515_exact_control`: timed out on 2026-07-22; archived at `submission/archive/timeout_v88_515_exact_control_2026_07_22/`; do not resubmit unchanged.
 - `v88_515_plus_k1_safe_speed`: public LB `86.720`; finished but did not promote. Exact URL validation plus probe-bank pruning likely reduced returned volume.
 - `v88_515_plus_gpt_k2_probe`: public LB `88.965`; current best local submitted result. K1 path uses `K1_REPLAY_SAFE = 0.99`, K2 path uses `K2_REPLAY_SAFE = 0.985`.
-- `v38_hybrid_c_k2_plus_original_k1_safe`: timed out; not replay-stable enough.
-- `v39_gpt_k3_k2_aggressive`: public LB `69.454`; high-K density failed in hosted scoring.
-- `v40_multimessage_k1_batching`: pending.
-- `v41_gpt_harmony_prefill_probe`: pending.
+- `timeout_v38_hybrid_c_k2_plus_original_k1_safe_2026_07_23`: timed out; not replay-stable enough.
+- `lb_69_454_v39_gpt_k3_k2_aggressive`: public LB `69.454`; high-K density failed in hosted scoring.
+- `lb_77_625_v40_multimessage_k1_batching`: public LB `77.625`; continuation batching did not promote.
+- `lb_78_135_v41_gpt_harmony_prefill_probe`: public LB `78.135`; current harmony/prefill approach did not promote.
+- `v42_gpt_k2_analysis_compression`: public LB `88.245`; close but below C.
+- `v43_c_conservative_selected_only`: public LB `87.175`; selected-only packing lost useful volume.
+- `v44_k1_replay_safe_reference`: public LB `87.390`; K1-only replay safety is stable but not enough.
+- `v45_c_cd_stack_conservative`: superseded; use V47 for this conservative CD-stack source.
+- `v46_gpt_k2_cd_stack_aggressive`: public LB `84.170`; aggressive CD-stack path did not promote.
+- `v47_c_cd_stack_conservative`: public LB `86.400`; conservative CD-stack path did not promote.
+- `v48_replay_cost_tax_fix`: ready to submit; replay-cost-tax fix from C.
+- `v49_probe_emit_safe`: ready to submit; high-upside probe-to-emit safe sizing.
+- `v50_probe_emit_aggressive`: ready to submit; high-risk probe-to-emit sizing toward `110+`.
 
 The previous current sweep has been archived:
 
@@ -116,12 +150,22 @@ Priority order after the exact-control timeout and B/C results:
 1. Do not resubmit `v88_515_exact_control` unchanged.
 2. Promote `v88_515_plus_gpt_k2_probe` (`88.965`) as the current reproducible public baseline.
 3. Treat V38 timeout and V39 `69.454` as negative evidence for broad high-K replay packing.
-4. Use V40/V41 to test two narrower hypotheses:
-   - V40: continuation/batched K1 may save reset overhead if hosted continuation is cheap enough.
-   - V41: GPT harmony/prefill may reduce reasoning-row latency without harming gemma.
-5. If both V40 and V41 fall below C, build V42 as a conservative C-derived K1/K2 throughput variant rather than increasing K.
-6. Treat CD/private hedge work as secondary. CD wording must avoid `send`, `email`, and `upload` in the final user message, or the predicate will not fire.
-7. Name future variants by submit attempt number first, e.g. `v40_strategy_name/`, with notes using the uppercase label `V40`.
+4. Treat V40 `77.625` and V41 `78.135` as negative evidence for continuation batching and current GPT harmony/prefill.
+5. Treat V42/V43/V44 as negative or calibration evidence:
+   - V42: compressed GPT K1/K2 templates scored `88.245`, close but below C.
+   - V43: conservative selected-only C packing scored `87.175`, so C's mixed bank matters.
+   - V44: K1-only replay-safe reference scored `87.390`, stable but not enough.
+6. Treat V46/V47 as negative evidence for current same-candidate EXFIL + CD stacking:
+   - V46: aggressive GPT K2+CD stack scored `84.170`.
+   - V47: conservative K1+CD stack scored `86.400`.
+   - The added CD raw value did not pay for the added latency/replay variance.
+7. With two public submissions left, the only large-jump path is probe-to-emit:
+   - V48 remains the conservative replay-cost-tax fallback.
+   - V49 probes a few full-hop K1 samples, uses conservative replay sizing, and emits without per-candidate live validation.
+   - V50 uses the same idea with a smaller safety multiplier and higher cap.
+   - Run `experiences/final-two-slots-probe/notebook.ipynb` first if time allows.
+8. Keep standalone CD/private hedge work secondary. CD wording must avoid `send`, `email`, and `upload` in the final user message, or the predicate will not fire.
+9. Name future variants by submit attempt number first, e.g. `v48_strategy_name/`, with notes using the uppercase label `V48`.
 
 ## Kaggle Submission Requirements
 
@@ -143,10 +187,15 @@ Before submitting, run a syntax check on the chosen source:
 python3 -m py_compile submission/current/v88_515_exact_control/submit.py
 python3 -m py_compile submission/current/v88_515_plus_k1_safe_speed/submit.py
 python3 -m py_compile submission/current/v88_515_plus_gpt_k2_probe/submit.py
-python3 -m py_compile submission/current/v38_hybrid_c_k2_plus_original_k1_safe/submit.py
-python3 -m py_compile submission/current/v39_gpt_k3_k2_aggressive/submit.py
-python3 -m py_compile submission/current/v40_multimessage_k1_batching/submit.py
-python3 -m py_compile submission/current/v41_gpt_harmony_prefill_probe/submit.py
+python3 -m py_compile submission/current/v42_gpt_k2_analysis_compression/submit.py
+python3 -m py_compile submission/current/v43_c_conservative_selected_only/submit.py
+python3 -m py_compile submission/current/v44_k1_replay_safe_reference/submit.py
+python3 -m py_compile submission/current/v45_c_cd_stack_conservative/submit.py
+python3 -m py_compile submission/current/v46_gpt_k2_cd_stack_aggressive/submit.py
+python3 -m py_compile submission/current/v47_c_cd_stack_conservative/submit.py
+python3 -m py_compile submission/current/v48_replay_cost_tax_fix/submit.py
+python3 -m py_compile submission/current/v49_probe_emit_safe/submit.py
+python3 -m py_compile submission/current/v50_probe_emit_aggressive/submit.py
 ```
 
 Do not submit from the legacy notebook by accident; copy the intended variant source into the writer cell each time.
