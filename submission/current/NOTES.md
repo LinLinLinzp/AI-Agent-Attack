@@ -35,6 +35,35 @@ V46/V47 result update: `V46` scored `84.170` and `V47` scored `86.400`. Both
 same-candidate EXFIL + CD stack variants underperformed C, so CD stacking should
 not remain the public-score mainline.
 
+V48/V49/V50 result update: `V48` scored `88.305`, `V49` scored `68.895`, and
+`V50` scored `83.880`. V48 stayed close but below C; V49/V50 rejected broad
+probe-to-emit as implemented because unvalidated replay success did not hold.
+
+V51/V52 result update: `V51` scored `87.505`, and `V52` timed out. Kaggle showed
+`Submission Format Error`, but treat this run as a runtime-budget failure unless
+future evidence shows a writer/schema bug. V51 rejects wider C bank retention
+plus stronger K2 bias. V52 was raw18 K1 emit, not raw34; it rejects fixed `1250`
+emit as a full-chain Kaggle submission strategy.
+
+V53/V54/V55 result update: `V53` scored `65.700`, `V54` scored `60.930`, and
+`V55` scored `61.065`. The user observed that these submissions scored much
+faster than previous 12h+ jobs. Treat this as evidence of insufficient returned
+or effective replay volume. V53 is roughly `730` K1-equivalent cells, so the
+live-probe ledger likely overestimated replay cost and shrank the returned set.
+V54/V55 reject the current K2 probe-to-emit implementation because lowering the
+K2 cap did not improve the score.
+
+V56/V57/V58 prepared: V56 keeps C's exact full-hop path while releasing generation
+tail reserve; V57 retests cheap fill with exact hop1 trace checks; V58 is a
+high-risk fixed `1120` K1 underfill test targeting about `100.8` if fully stable.
+
+V56/V57/V58 result update: `V56` scored `88.965`, while `V57` and `V58` timed
+out. Kaggle showed `Submission Format Error`, but these are timeout-class
+failures for our archive. V56 tying C exactly means generation-tail reserve is
+not the missing bottleneck. V57 rejects hop1 exact-fill as full-chain
+budget-unsafe. V58 rejects fixed `1120` static K1 return; V52 was not merely too
+high at `1250`.
+
 ## Baseline Mechanics
 
 The `88.515` baseline improves the earlier `67.365` family without changing the scored primitive:
@@ -74,9 +103,17 @@ The key lesson is that K=1 still has room when replay sizing is more accurate. T
 - `v45_c_cd_stack_conservative/submit.py`: V45; superseded because the V45 Kaggle slot was accidentally used by another V44 submission. Do not submit this as V45.
 - `v46_gpt_k2_cd_stack_aggressive/submit.py`: V46; public LB `84.170`; completed, did not promote.
 - `v47_c_cd_stack_conservative/submit.py`: V47; public LB `86.400`; completed, did not promote.
-- `v48_replay_cost_tax_fix/submit.py`: V48; ready to submit; starts from C, uses hop-1 K1 fill charged by full-hop replay cost, and keeps C's near-selected mixed bank.
-- `v49_probe_emit_safe/submit.py`: V49; ready to submit; probes current row, estimates replay unit conservatively, then emits a larger K1 portfolio.
-- `v50_probe_emit_aggressive/submit.py`: V50; ready to submit; same probe-to-emit idea, sized closer to the replay edge.
+- `v48_replay_cost_tax_fix/submit.py`: V48; public LB `88.305`; completed, did not promote.
+- `v49_probe_emit_safe/submit.py`: V49; public LB `68.895`; completed, did not promote.
+- `v50_probe_emit_aggressive/submit.py`: V50; public LB `83.880`; completed, did not promote.
+- `v51_c_bank_wide_k2_edge/submit.py`: V51; public LB `87.505`; completed, did not promote.
+- `v52_plain_reply_emit_1250/submit.py`: V52; timeout; Kaggle displayed Submission Format Error; completed, do not resubmit unchanged.
+- `v53_k1_emit_ledger_1120/submit.py`: V53; public LB `65.700`; completed, did not promote.
+- `v54_k2_probe_ledger_800/submit.py`: V54; public LB `60.930`; completed, did not promote.
+- `v55_k2_conservative_650/submit.py`: V55; public LB `61.065`; completed, did not promote.
+- `v56_c_exact_tail_release/submit.py`: V56; public LB `88.965`; completed, tied C.
+- `v57_c_hop1_exact_fill/submit.py`: V57; timeout; Kaggle displayed Submission Format Error; completed, do not resubmit unchanged.
+- `v58_static_fast_route_1120/submit.py`: V58; timeout; Kaggle displayed Submission Format Error; completed, do not resubmit unchanged.
 
 Archived completed numbered variants:
 
@@ -89,6 +126,17 @@ Archived completed numbered variants:
 - `submission/archive/lb_87_390_v44_k1_replay_safe_reference/submit.py`: V44 public LB `87.390`.
 - `submission/archive/lb_84_170_v46_gpt_k2_cd_stack_aggressive/submit.py`: V46 public LB `84.170`.
 - `submission/archive/lb_86_400_v47_c_cd_stack_conservative/submit.py`: V47 public LB `86.400`.
+- `submission/archive/lb_88_305_v48_replay_cost_tax_fix/submit.py`: V48 public LB `88.305`.
+- `submission/archive/lb_68_895_v49_probe_emit_safe/submit.py`: V49 public LB `68.895`.
+- `submission/archive/lb_83_880_v50_probe_emit_aggressive/submit.py`: V50 public LB `83.880`.
+- `submission/archive/lb_87_505_v51_c_bank_wide_k2_edge/submit.py`: V51 public LB `87.505`.
+- `submission/archive/timeout_v52_plain_reply_emit_1250_2026_07_27/submit.py`: V52 timeout.
+- `submission/archive/lb_65_700_v53_k1_emit_ledger_1120/submit.py`: V53 public LB `65.700`.
+- `submission/archive/lb_60_930_v54_k2_probe_ledger_800/submit.py`: V54 public LB `60.930`.
+- `submission/archive/lb_61_065_v55_k2_conservative_650/submit.py`: V55 public LB `61.065`.
+- `submission/archive/lb_88_965_v56_c_exact_tail_release/submit.py`: V56 public LB `88.965`.
+- `submission/archive/timeout_v57_c_hop1_exact_fill_2026_07_28/submit.py`: V57 timeout.
+- `submission/archive/timeout_v58_static_fast_route_1120_2026_07_28/submit.py`: V58 timeout.
 
 Current result status:
 
@@ -105,9 +153,17 @@ Current result status:
 - `v45_c_cd_stack_conservative`: superseded; use V47 for this conservative CD-stack source.
 - `v46_gpt_k2_cd_stack_aggressive`: public LB `84.170`; aggressive CD-stack path did not promote.
 - `v47_c_cd_stack_conservative`: public LB `86.400`; conservative CD-stack path did not promote.
-- `v48_replay_cost_tax_fix`: ready to submit; replay-cost-tax fix from C.
-- `v49_probe_emit_safe`: ready to submit; high-upside probe-to-emit safe sizing.
-- `v50_probe_emit_aggressive`: ready to submit; high-risk probe-to-emit sizing toward `110+`.
+- `v48_replay_cost_tax_fix`: public LB `88.305`; close to C but below baseline.
+- `v49_probe_emit_safe`: public LB `68.895`; broad unvalidated probe-to-emit failed.
+- `v50_probe_emit_aggressive`: public LB `83.880`; aggressive unvalidated emit stayed below C.
+- `v51_c_bank_wide_k2_edge`: public LB `87.505`; below C.
+- `v52_plain_reply_emit_1250`: timeout; Kaggle displayed Submission Format Error; fixed `1250` count rejected.
+- `v53_k1_emit_ledger_1120`: public LB `65.700`; dynamic ledger returned too little effective volume.
+- `v54_k2_probe_ledger_800`: public LB `60.930`; current exact K2 probe-to-emit did not transfer.
+- `v55_k2_conservative_650`: public LB `61.065`; conservative K2 cap did not help.
+- `v56_c_exact_tail_release`: public LB `88.965`; exact-validation tail-reserve test tied C.
+- `v57_c_hop1_exact_fill`: timeout; Kaggle displayed Submission Format Error; exact hop1 fill is budget-unsafe unchanged.
+- `v58_static_fast_route_1120`: timeout; Kaggle displayed Submission Format Error; fixed-count underfill test is budget-unsafe unchanged.
 
 The previous current sweep has been archived:
 
@@ -134,6 +190,14 @@ Reference conversions:
 86.720 / 0.09 ~= 964 K=1-equivalent cells
 88.515 / 0.09 ~= 984 successful cells
 88.965 / 0.09 ~= 989 K=1-equivalent cells
+88.305 / 0.09 ~= 981 K=1-equivalent cells
+68.895 / 0.09 ~= 765 K=1-equivalent cells
+83.880 / 0.09 ~= 932 K=1-equivalent cells
+87.505 / 0.09 ~= 972 K=1-equivalent cells
+65.700 / 0.09 = 730 K=1-equivalent cells
+60.930 / 0.09 ~= 677 K=1-equivalent cells
+61.065 / 0.09 ~= 679 K=1-equivalent cells
+88.965 / 0.09 ~= 989 K=1-equivalent cells
 100.000 / 0.09 ~= 1112 successful cells
 100.600 / 0.09 ~= 1118 successful cells
 ```
@@ -159,13 +223,26 @@ Priority order after the exact-control timeout and B/C results:
    - V46: aggressive GPT K2+CD stack scored `84.170`.
    - V47: conservative K1+CD stack scored `86.400`.
    - The added CD raw value did not pay for the added latency/replay variance.
-7. With two public submissions left, the only large-jump path is probe-to-emit:
-   - V48 remains the conservative replay-cost-tax fallback.
-   - V49 probes a few full-hop K1 samples, uses conservative replay sizing, and emits without per-candidate live validation.
-   - V50 uses the same idea with a smaller safety multiplier and higher cap.
-   - Run `experiences/final-two-slots-probe/notebook.ipynb` first if time allows.
-8. Keep standalone CD/private hedge work secondary. CD wording must avoid `send`, `email`, and `upload` in the final user message, or the predicate will not fire.
-9. Name future variants by submit attempt number first, e.g. `v48_strategy_name/`, with notes using the uppercase label `V48`.
+7. Treat V48/V49/V50 as completed calibration:
+   - V48: shortcut validation / fast fill loses a little versus C.
+   - V49/V50: broad unvalidated probe-to-emit loses too much replay success.
+   - Do not continue generic probe-to-emit selection unchanged.
+8. Treat V51/V52 as completed calibration:
+   - V51: wider bank retention and stronger K2 bias lost score versus C.
+   - V52: fixed `1250` raw18 K1 emit timed out; fixed count is not budget-safe.
+   - Gateway replay validation still suggests `100+` is possible, but only with full-chain replay-margin sizing.
+9. Treat V53/V54/V55 as completed negative calibration:
+   - V53: dynamic K1 emit ledger scored only `65.700`, about `730` K1-equivalent cells.
+   - V54/V55: K2 probe-to-emit scored near `61`, so the raw34 path did not transfer.
+   - The short scoring time points to insufficient returned/effective replay volume, not timeout pressure.
+10. Next public attempts should separate live template validation from bulk replay sizing. Do not use live probe latency directly as the replay-unit estimate without a correction factor or a validated lower floor.
+11. Treat V56/V57/V58 as completed calibration:
+   - V56: tied C at `88.965`; generation-tail reserve is not the bottleneck.
+   - V57: timeout; exact hop1 fill is not full-chain budget-safe.
+   - V58: timeout; fixed `1120` static K1 return is not budget-safe.
+12. Stop K1-volume shortcuts until a full-chain diagnostic explains the timeout boundary.
+13. Keep standalone CD/private hedge work secondary. CD wording must avoid `send`, `email`, and `upload` in the final user message, or the predicate will not fire.
+14. Name future variants by submit attempt number first, e.g. `v59_strategy_name/`, with notes using the uppercase label `V59`.
 
 ## Kaggle Submission Requirements
 
@@ -196,6 +273,14 @@ python3 -m py_compile submission/current/v47_c_cd_stack_conservative/submit.py
 python3 -m py_compile submission/current/v48_replay_cost_tax_fix/submit.py
 python3 -m py_compile submission/current/v49_probe_emit_safe/submit.py
 python3 -m py_compile submission/current/v50_probe_emit_aggressive/submit.py
+python3 -m py_compile submission/current/v51_c_bank_wide_k2_edge/submit.py
+python3 -m py_compile submission/current/v52_plain_reply_emit_1250/submit.py
+python3 -m py_compile submission/current/v53_k1_emit_ledger_1120/submit.py
+python3 -m py_compile submission/current/v54_k2_probe_ledger_800/submit.py
+python3 -m py_compile submission/current/v55_k2_conservative_650/submit.py
+python3 -m py_compile submission/current/v56_c_exact_tail_release/submit.py
+python3 -m py_compile submission/current/v57_c_hop1_exact_fill/submit.py
+python3 -m py_compile submission/current/v58_static_fast_route_1120/submit.py
 ```
 
 Do not submit from the legacy notebook by accident; copy the intended variant source into the writer cell each time.

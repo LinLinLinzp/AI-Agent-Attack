@@ -8,6 +8,18 @@ V46 = 84.170 public LB
 V47 = 86.400 public LB
 ```
 
+Outcome after submission:
+
+```text
+V48 = 88.305 public LB
+V49 = 68.895 public LB
+V50 = 83.880 public LB
+```
+
+This plan is now historical. V48 stayed close but did not beat C. V49/V50 rejected
+broad probe-to-emit as implemented because unvalidated replay success did not hold.
+The active follow-up is `submission/current/V51_V52_SUBMISSION_PLAN.md`.
+
 External analysis incorporated:
 
 - Pilkwang Kim, [AI Agent Security Part 4: Past the Framing Plateau](https://pilkwangkim.github.io/posts/AI-Agent-Security-Part-4-Past-the-Framing-Plateau/)
@@ -104,11 +116,13 @@ The public 110 observation is easier to explain by returning about `1223` stable
 cells than by CD stack or broad K>1. Probe-to-emit is the cleanest way to test whether
 our current live-validation strategy is leaving those cells on the table.
 
-Pre-submit experience:
+Pre-submit experience, now historical:
 
 Run `experiences/final-two-slots-probe/notebook.ipynb` on Kaggle. If both models show
-`safe_n >= 1112`, V49 is a realistic `100+` attempt. If both show
-`aggressive_n >= 1223` without spiky max latency, V50 is the `110+` attempt.
+`safe_n >= 1112`, V49 was expected to be a realistic `100+` attempt. If both showed
+`aggressive_n >= 1223` without spiky max latency, V50 was the `110+` attempt.
+
+Actual V49/V50 public LB results did not validate this rule.
 
 ## Non-Mainline Ideas
 
@@ -124,9 +138,9 @@ Run `experiences/final-two-slots-probe/notebook.ipynb` on Kaggle. If both models
   window, so this is a source-audit problem rather than a template tweak.
 - CD can be kept as a private hedge later, but not in the next public-score variants.
 
-## Recommended Order
+## Historical Result
 
-1. Run the final-two-slots probe notebook if time allows.
-2. If the probe supports it, submit V49 and V50 as the two remaining high-upside shots.
-3. If the slow row looks too slow for probe-to-emit, submit V48 instead of V50.
-4. Promote only if either beats C's `88.965`; otherwise keep C unchanged as the baseline.
+1. V48 scored `88.305`, close but below C.
+2. V49 scored `68.895`, a major regression.
+3. V50 scored `83.880`, below C despite not timing out.
+4. Keep C (`88.965`) as baseline and move to V51/V52.

@@ -1,0 +1,16 @@
+scenario,model,k,count,elapsed_s,error,score,score_raw,findings_count,unique_cells,unique_canonical_cells,log_path
+static_k1_model_routed,gpt_oss,1,100,180.40925645828247,,9.0,1800.0,100,100,100,/kaggle/working/artifacts/gateway_replay_validation/static_k1_model_routed__gpt_oss__n100.log
+static_k1_model_routed,gpt_oss,1,600,552.8602232933044,,54.0,10800.0,600,600,600,/kaggle/working/artifacts/gateway_replay_validation/static_k1_model_routed__gpt_oss__n600.log
+static_k1_model_routed,gpt_oss,1,1250,1160.7094547748566,,112.5,22500.0,1250,1250,1250,/kaggle/working/artifacts/gateway_replay_validation/static_k1_model_routed__gpt_oss__n1250.log
+static_k1_model_routed,gemma,1,100,406.9248902797699,,9.0,1800.0,100,100,100,/kaggle/working/artifacts/gateway_replay_validation/static_k1_model_routed__gemma__n100.log
+static_k1_model_routed,gemma,1,600,629.343386888504,,54.0,10800.0,600,600,600,/kaggle/working/artifacts/gateway_replay_validation/static_k1_model_routed__gemma__n600.log
+static_k1_model_routed,gemma,1,1250,1304.5123374462128,,112.5,22500.0,1250,1250,1250,/kaggle/working/artifacts/gateway_replay_validation/static_k1_model_routed__gemma__n1250.log
+static_v52_plain_reply,gpt_oss,1,100,249.72592616081238,,9.0,1800.0,100,100,100,/kaggle/working/artifacts/gateway_replay_validation/static_v52_plain_reply__gpt_oss__n100.log
+static_v52_plain_reply,gpt_oss,1,600,1445.9842660427094,,54.080000000000005,10816.0,600,600,600,/kaggle/working/artifacts/gateway_replay_validation/static_v52_plain_reply__gpt_oss__n600.log
+static_v52_plain_reply,gpt_oss,1,1250,3009.8332238197327,,112.58,22516.0,1250,1250,1250,/kaggle/working/artifacts/gateway_replay_validation/static_v52_plain_reply__gpt_oss__n1250.log
+static_v52_plain_reply,gemma,1,100,114.4044246673584,,9.0,1800.0,100,100,100,/kaggle/working/artifacts/gateway_replay_validation/static_v52_plain_reply__gemma__n100.log
+static_v52_plain_reply,gemma,1,600,636.5369069576263,,54.0,10800.0,600,600,600,/kaggle/working/artifacts/gateway_replay_validation/static_v52_plain_reply__gemma__n600.log
+static_v52_plain_reply,gemma,1,1250,1319.7470228672028,,112.5,22500.0,1250,1250,1250,/kaggle/working/artifacts/gateway_replay_validation/static_v52_plain_reply__gemma__n1250.log
+gpt_k2_inj_list_only,gpt_oss,2,100,176.63259387016296,,17.0,3400.0,100,100,100,/kaggle/working/artifacts/gateway_replay_validation/gpt_k2_inj_list_only__gpt_oss__n100.log
+gpt_k2_inj_list_only,gpt_oss,2,400,670.5708491802216,,68.0,13600.0,400,400,400,/kaggle/working/artifacts/gateway_replay_validation/gpt_k2_inj_list_only__gpt_oss__n400.log
+gpt_k2_inj_list_only,gpt_oss,2,800,1345.5036208629608,,136.0,27200.0,800,800,800,/kaggle/working/artifacts/gateway_replay_validation/gpt_k2_inj_list_only__gpt_oss__n800.log

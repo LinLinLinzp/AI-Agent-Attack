@@ -28,6 +28,17 @@ archive snapshots here when a submission teaches us something useful.
 | 87.390 | unknown | `lb_87_390_v44_k1_replay_safe_reference/` | V44 replay-safe K1 reference | K1-only external 88.515 race with `REPLAY_SAFE = 0.982` | Stable but below C and below the external 88.515 reference. Extra K1 replay headroom does not close the gap to 100. |
 | 84.170 | unknown | `lb_84_170_v46_gpt_k2_cd_stack_aggressive/` | V46 aggressive GPT K2 + CD stack | Adds K1+CD and GPT-only K2+CD stack templates, `CD_STACK_SCORE_BIAS = 1.08`, `CD_STACK_REPLAY_SAFE = 0.982` | Scored `4.795` below C. The CD-stack multiplier did not overcome added latency/replay instability; do not continue this aggressive stack line unchanged. |
 | 86.400 | unknown | `lb_86_400_v47_c_cd_stack_conservative/` | V47 conservative C + K1/CD stack | Keeps C K1/K2 templates, adds only K1+CD stack templates, no positive CD bias, `CD_STACK_REPLAY_SAFE = 0.975` | Scored `2.565` below C. Even conservative same-candidate EXFIL+CD stacking is currently too expensive or too unstable; C remains the baseline. |
+| 88.305 | unknown | `lb_88_305_v48_replay_cost_tax_fix/` | V48 replay-cost-tax fix | Starts from C, uses hop-1 K1 fill charged by full-hop replay cost, adds `bare_ok_only` | Close to C but still `0.660` lower. Shortcut validation / fast fill did not promote. |
+| 68.895 | unknown | `lb_68_895_v49_probe_emit_safe/` | V49 safe probe-to-emit | Few full-hop probes, then larger unvalidated K1 portfolio with conservative sizing | Major regression. Rejects broad unvalidated probe-to-emit as implemented; replay success did not match generation probes. |
+| 83.880 | unknown | `lb_83_880_v50_probe_emit_aggressive/` | V50 aggressive probe-to-emit | Same as V49 with looser safety and higher cap | Below C but did not timeout. Confirms the issue is replay hit-rate/density, not only timeout. |
+| 87.505 | unknown | `lb_87_505_v51_c_bank_wide_k2_edge/` | V51 C bank-wide / K2 edge | Starts from C with `BANK_COST_MULT = 1.35` and `K2_SCORE_BIAS = 1.12` | Underperformed C. Wider validated-bank retention and stronger K2 bias did not promote. |
+| timeout | n/a | `timeout_v52_plain_reply_emit_1250_2026_07_27/` | V52 fixed plain Reply OK emit | Probes a small plain K1 family, then emits fixed count `1250` | Kaggle displayed Submission Format Error, interpreted as timeout in this competition run. This was raw18 K1, not raw34. Fixed count is not budget-safe as a full-chain Kaggle submission strategy. |
+| 65.700 | unknown | `lb_65_700_v53_k1_emit_ledger_1120/` | V53 K1 emit ledger | Live probes estimate replay unit, then emit up to `1120` K1 candidates | Major regression. Score is about `730` K1-equivalent cells, and the user observed much shorter scoring time; the ledger likely returned too few candidates because live-probe latency was treated as bulk replay cost. |
+| 60.930 | unknown | `lb_60_930_v54_k2_probe_ledger_800/` | V54 aggressive K2 probe ledger | Exact K2 probe-to-emit with K1 fallback, K2 cap `800` | Major regression. The raw34 lane did not transfer into public scoring; short scoring time suggests low returned/effective replay volume rather than timeout pressure. |
+| 61.065 | unknown | `lb_61_065_v55_k2_conservative_650/` | V55 conservative K2 probe ledger | Same K2 idea as V54 but K2 cap `650` and lower replay safety | Major regression and nearly identical to V54. Lower cap did not help, so the failure is selection/transfer/ledger sizing rather than only K2 cap aggressiveness. |
+| 88.965 | unknown | `lb_88_965_v56_c_exact_tail_release/` | V56 exact tail release | C full-hop exact validation with smaller generation reserve and cold-start `slowest` reset | Tied C exactly. Generation-tail reserve is not the missing 100-point bottleneck; C is likely replay-budget/raw-density limited. |
+| timeout | n/a | `timeout_v57_c_hop1_exact_fill_2026_07_28/` | V57 hop1 exact fill | C selector plus hop1 exact trace fill and periodic full-hop audits | Kaggle displayed Submission Format Error, interpreted as timeout in this competition run. Cheap-fill shortcut is not full-chain budget-safe even with exact trace checks. |
+| timeout | n/a | `timeout_v58_static_fast_route_1120_2026_07_28/` | V58 static fast route 1120 | Fixed model-routed K1 `1120` return | Kaggle displayed Submission Format Error, interpreted as timeout in this competition run. Fixed large static return remains budget-unsafe; V52 was not only too high at `1250`. |
 | 100.600 | 1 / unknown | external/top1 | unknown | unknown | Public top score observed by user. With the current single-post primitive, this would require about 1118 successful unique cells. |
 | ~110 | unknown | external/top score | unknown | unknown | New public ceiling observed by user after C returned. From `88.965`, a `110.000` target would need about `233` additional K=1-equivalent cells, so high-K GPT density is likely required. |
 
@@ -59,6 +70,13 @@ Useful conversions:
 86.720 / 0.09 ~= 964 K=1-equivalent cells
 84.170 / 0.09 ~= 935 K=1-equivalent cells
 86.400 / 0.09 ~= 960 K=1-equivalent cells
+88.305 / 0.09 ~= 981 K=1-equivalent cells
+68.895 / 0.09 ~= 765 K=1-equivalent cells
+83.880 / 0.09 ~= 932 K=1-equivalent cells
+87.505 / 0.09 ~= 972 K=1-equivalent cells
+65.700 / 0.09 = 730 K=1-equivalent cells
+60.930 / 0.09 ~= 677 K=1-equivalent cells
+61.065 / 0.09 ~= 679 K=1-equivalent cells
 88.515 / 0.09 ~= 984 successful cells
 88.965 / 0.09 ~= 989 K=1-equivalent cells
 100.000 / 0.09 ~= 1112 successful cells
@@ -85,6 +103,14 @@ Shared by the 60+ public LB family and the `88.515` reference:
 
 The core lesson is replay-safe throughput. The `88.515` jump came from better
 template racing and replay-cost sizing, not from changing the primitive.
+
+## Timeout Label Convention
+
+For these Kaggle runs, a public `Submission Format Error` can be caused by the
+notebook failing to finish and write/serve valid output within the full-chain
+budget. In this archive, V52, V57, and V58 are therefore recorded as `timeout`
+results. Treat them as runtime-budget failures unless a future run gives direct
+evidence of a schema or writer-cell bug.
 
 ## Submission Workflow Note
 
@@ -137,6 +163,57 @@ CONFUSED_DEPUTY` stacking as a negative result in the current implementation:
 the extra `+4 raw` from CD is not enough to pay for the added tool generation,
 selection noise, and replay variance. Future work should return to C's
 throughput/replay accounting or use only very small CD probes.
+
+The 2026-07-26 probe-to-emit follow-up results:
+
+- `V48`: public LB `88.305`.
+- `V49`: public LB `68.895`.
+- `V50`: public LB `83.880`.
+
+V48 stayed close to C but did not improve it. V49/V50 show that broad
+probe-to-emit is not enough: unvalidated candidates lose too much replay
+success even when the submission does not timeout. The next follow-up should
+either stay on C's validated replay ledger or isolate a single known-good static
+template rather than selecting among mixed unvalidated templates.
+
+The 2026-07-27 V51/V52 follow-up results:
+
+- `V51`: public LB `87.505`.
+- `V52`: timeout; Kaggle displayed Submission Format Error.
+
+V51 stayed below C, so broader bank retention and stronger K2 bias should not be
+continued unchanged. V52 was raw18 K1 emit, not raw34, and its fixed `1250`
+count is not safe as a full-chain submission. Isolated gateway replay validation
+still suggests that K1 `1250` and GPT K2 `800` can exceed `100`, but follow-ups
+must use measured replay-margin sizing and hard caps rather than fixed counts.
+
+The 2026-07-27 V53/V54/V55 follow-up results:
+
+- `V53`: public LB `65.700`.
+- `V54`: public LB `60.930`.
+- `V55`: public LB `61.065`.
+
+All three scored much faster than the prior 12h+ runs reported by the user.
+Treat this as a clue that the variants returned too little replay work. V53's
+score is exactly about `730` K1-equivalent cells, consistent with its dynamic
+ledger estimating a high replay unit from live probes and shrinking the returned
+set. V54/V55 clustering near `61` rejects the current raw34 K2 probe-to-emit
+implementation; the next attempt should decouple live validation latency from
+bulk replay sizing and recover candidate volume before trying higher K again.
+
+The 2026-07-28 V56/V57/V58 follow-up results:
+
+- `V56`: public LB `88.965`.
+- `V57`: timeout; Kaggle displayed Submission Format Error.
+- `V58`: timeout; Kaggle displayed Submission Format Error.
+
+V56 tied C exactly, so reducing generation-tail reserve did not add volume. V57
+timed out, so hop1 exact fill is still not full-chain budget-safe. V58 timed
+out, so fixed `1120` K1 static return is budget-unsafe, not just fixed `1250`.
+Together these reject the
+remaining K1-volume shortcuts. The next public breakthrough likely requires a
+new raw-per-replay-candidate mechanism or a full-chain diagnostic that proves a
+specific lower-cost replay path.
 
 The public Kaggle writeup
 ["The Scored Attack Surface Collapses to a Single Predicate"](https://www.kaggle.com/writeups/canqiang/the-scored-attack-surface-collapses-to-a-single-pr)

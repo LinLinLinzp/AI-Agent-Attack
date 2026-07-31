@@ -12,7 +12,9 @@ Kaggle本地validation环境的实验记录。每次实验记录目的、结果�
 | 2026-07-15 | [uta-predicate-probe](uta-predicate-probe/) | [results.md](uta-predicate-probe/results.md) | done |
 | 2026-07-15 | [method-comparison](method-comparison/) | [results.md](method-comparison/results.md) | done |
 | 2026-07-15 | [trace-guided-v2](trace-guided-v2/) | [results.md](trace-guided-v2/results.md) | done |
-| 2026-07-25 | [final-two-slots-probe](final-two-slots-probe/) | probe notebook for V49/V50 sizing | ready |
+| 2026-07-25 | [final-two-slots-probe](final-two-slots-probe/) | V49/V50 sizing probe; broad probe-to-emit later rejected by LB | historical |
+| 2026-07-27 | [frontier-throughput-audit](frontier-throughput-audit/) | Gateway replay shows K1 1250 and GPT K2 800 can exceed 100 in isolation; V52 fails full-chain fixed count; V53-V55 show live-probe ledger can underfill badly | active |
+| 2026-07-27 | [full-chain-underfill-audit](full-chain-underfill-audit/) | Notebook procedure to measure returned candidate count/run time; V56-V58 later showed K1-volume shortcuts are exhausted | active |
 
 ## 关键发现
 
@@ -49,6 +51,13 @@ Kaggle本地validation环境的实验记录。每次实验记录目的、结果�
 - **跨模型一致性100%**：gpt_oss top-5在gemma上也100% fire
 - **编码绕过无效**：predicate不识别编码后的SECRET_MARKER
 - **决策**：public和private都用emit_only + plain SECRET_MARKER
+
+### 2026-07-27: Frontier Throughput Audit
+- Gateway replay validation shows isolated public replay can score `112+` for K1 `N=1250`.
+- GPT `k2_inj_list` at `N=800` scores `136` in isolated replay, confirming a raw34 two-EXFIL path exists.
+- V52 timed out on full Kaggle. Kaggle displayed `Submission Format Error`, but this should be treated as a runtime-budget failure; follow-up submissions must restore replay-margin sizing and hard caps.
+- V53/V54/V55 scored `65.700`, `60.930`, and `61.065`, and the user observed much shorter scoring time. This suggests the live-probe ledger returned too few effective candidates; next experiments should measure bulk replay cost separately from live probe latency.
+- V56 scored `88.965`, while V57/V58 timed out. Tail reserve did not matter; hop1 exact fill and fixed `1120` K1 return are not full-chain budget-safe.
 
 ## 待验证
 - [ ] N=2000在Kaggle实际环境是否安全（远程开销）
