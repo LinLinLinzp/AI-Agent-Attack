@@ -10,7 +10,7 @@ Recent negative evidence:
 
 ```text
 V38 = timeout
-V39 = 69.454 public LB
+V39 = 69.545 public LB
 V40 = 77.625 public LB
 V41 = 78.135 public LB
 ```

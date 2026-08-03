@@ -1,6 +1,6 @@
-# LB 69.454: V39 GPT K3/K2 Aggressive
+# LB 69.545: V39 GPT K3/K2 Aggressive
 
-Public LB reported by user: `69.454`.
+Public LB confirmed from the Kaggle submissions page: `69.545`.
 
 Source:
 
